@@ -1,9 +1,9 @@
 'use strict';
-const {URL} = require('url');
+const {resolve, parse} = require('url'); // eslint-disable-line node/no-deprecated-api
 const cheerio = require('cheerio');
 const normalizeUrl = require('normalize-url');
 
-const FAKE_PROTOCOL = 'fake:';
+const FAKE_PROTOCOL = 'http:';
 const FAKE_HOSTNAME = 'base.url';
 
 const defaultNormalizeOpts = {
@@ -51,7 +51,7 @@ const getHrefs = (
 	const base = $('base');
 
 	if (base.length !== 0) {
-		baseUrl = new URL(base.first().attr('href') || '', baseUrl).toString();
+		baseUrl = resolve(baseUrl, base.first().attr('href') || '');
 	}
 
 	const hrefs = $('a')
@@ -64,11 +64,11 @@ const getHrefs = (
 		}
 
 		try {
-			const url = new URL(href, baseUrl);
+			const url = parse(resolve(baseUrl, href));
 			if (isFake(url)) {
-				hrefs.push(stripFake(tryNormalize(url.toString(), opts)));
+				hrefs.push(stripFake(tryNormalize(url.format(), opts)));
 			} else if (protocols[url.protocol.slice(0, -1)]) {
-				hrefs.push(tryNormalize(url.toString(), opts));
+				hrefs.push(tryNormalize(url.format(), opts));
 			}
 		} catch (error) {
 			// Ignore errors (they are caused by invalid URLs and we don't care about them anyway)

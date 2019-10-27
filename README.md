@@ -57,6 +57,24 @@ Get all href urls from an HTML string
     echo '<a href="http://www.example.com">Link</a>' | get-hrefs --strip-w-w-w
 ```
 
+### Bigquery usage
+
+Run `npm run build:bq` and upload `dist/get-hrefs.js` to GCP Cloud Storage Bucket.
+
+```
+CREATE TEMP FUNCTION
+  getHrefs(html STRING,
+    baseUrl STRING)
+  RETURNS ARRAY<STRING>
+  LANGUAGE js OPTIONS ( library=["gs://<YOUR_BUCKET>/get-hrefs.js"] ) AS """
+return getHrefs(html, {baseUrl})
+""";
+SELECT
+  getHrefs('''<body>
+        <a href="lotto.html">Example</a>
+    </body>''', 'https://www.veikkaus.fi')
+```
+
 ## API
 
 ### `getHrefs(html, [options])`
