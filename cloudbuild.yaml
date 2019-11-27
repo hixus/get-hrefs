@@ -1,0 +1,11 @@
+steps:
+  - name: node:12-alpine3.9
+    entrypoint: npm
+    args: ['install']
+  - name: node:12-alpine3.9
+    entrypoint: npm
+    args: ['run', 'build:bq']
+artifacts:
+  objects:
+    location: '$_BUCKET_URL/'
+    paths: ['dist/get-hrefs.js']
